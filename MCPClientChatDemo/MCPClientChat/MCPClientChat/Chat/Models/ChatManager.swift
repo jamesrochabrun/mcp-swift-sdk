@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import MCPInterface
+import MCPClient
 
 @MainActor
 protocol ChatManager {
@@ -13,4 +15,5 @@ protocol ChatManager {
    var isProcessing: Bool { get }
    func stop()
    func send(message: ChatMessage)
+   func updateClient(_ client: MCPClient)
 }

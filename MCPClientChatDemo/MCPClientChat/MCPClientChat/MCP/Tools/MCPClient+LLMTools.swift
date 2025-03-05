@@ -9,27 +9,32 @@ import Foundation
 import MCPClient
 import MCPInterface
 import SwiftAnthropic
+import SwiftOpenAI
 
 // TODO: James+Gui decide where this should live so it can be reused.
 
+// MARK: Anthropic
+
 /**
- * Protocol that bridges the MCP (Multi-Client Protocol) framework with LLM providers library.
+ * Protocol that bridges the MCP (Multi-Client Protocol) framework with SwiftAnthropic library.
  *
  * This protocol provides methods to:
  * 1. Retrieve available tools from an MCP client and convert them to Anthropic's format
  * 2. Execute tools with provided parameters and handle their responses
  */
-protocol MCPLLMClient {
+extension MCPClient {
    
-   /// The underlying MCP client that processes requests
-   var client: MCPClient? { get }
    /**
     * Retrieves available tools from the MCP client and converts them to Anthropic's tool format.
     *
     * - Returns: An array of Anthropic-compatible tools
     * - Throws: Errors from the underlying MCP client or during conversion process
     */
-   func tools() async throws -> [MessageParameter.Tool]
+   func anthropicTools() async throws -> [SwiftAnthropic.MessageParameter.Tool] {
+      let tools = await tools
+      return try tools.value.get().map { $0.toAnthropicTool() }
+   }
+   
    /**
      * Executes a tool with the specified name and input parameters.
      *
@@ -39,28 +44,11 @@ protocol MCPLLMClient {
      *   - debug: Flag to enable verbose logging during execution
      * - Returns: A string containing the tool's response, or `nil` if execution failed
      */
-   func callTool(name: String, input: [String: Any], debug: Bool) async -> String?
-}
-
-/**
- * Extension providing default implementations of the MCPSwiftAnthropicClient protocol.
- */
-extension MCPLLMClient {
-   
-   func tools() async throws -> [MessageParameter.Tool] {
-      guard let client else { return [] }
-      let tools = await client.tools
-      return try tools.value.get().map { $0.toAnthropicTool() }
-   }
-   
-   func callTool(
+   func anthropicCallTool(
       name: String,
       input: [String: Any],
       debug: Bool)
       async -> String? {
-      
-      guard let client else { return nil }
-
       do {
          if debug {
             print("🔧 Calling tool '\(name)'...")
@@ -79,7 +67,7 @@ extension MCPLLMClient {
          let inputData = try JSONSerialization.data(withJSONObject: serializableInput)
          let inputJSON = try JSONDecoder().decode(JSON.self, from: inputData)
          
-         let result = try await client.callTool(named: name, arguments: inputJSON)
+         let result = try await callTool(named: name, arguments: inputJSON)
          
          if result.isError != true {
             if let content = result.content.first?.text?.text {
@@ -110,3 +98,5 @@ extension MCPLLMClient {
       }
    }
 }
+
+// MARK: OpenAI

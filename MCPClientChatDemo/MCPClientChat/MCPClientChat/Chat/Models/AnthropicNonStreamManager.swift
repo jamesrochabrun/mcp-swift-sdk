@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import MCPInterface
+import MCPClient
 import SwiftUI
 import SwiftAnthropic
 
 @MainActor
 @Observable
 // Handle a chat conversation without stream.
-final class ChatNonStreamManager: ChatManager {
+final class AnthropicNonStreamManager: ChatManager {
    
    /// Messages sent from the user or received from Claude
    var messages = [ChatMessage]()
@@ -33,19 +35,20 @@ final class ChatNonStreamManager: ChatManager {
    var isLoading = false
    
    /// Web research client for tool use
-   private let mcpLLMClient: MCPLLMClient
+   private var mcpClient: MCPClient?
    
-   init(
-      service: AnthropicService,
-      mcpLLMClient: MCPLLMClient)
+   init(service: AnthropicService)
    {
       self.service = service
-      self.mcpLLMClient = mcpLLMClient
    }
    
    /// Returns true if Claude is still processing a response
    var isProcessing: Bool {
       return isLoading
+   }
+   
+   func updateClient(_ client: MCPClient) {
+      mcpClient = client
    }
    
    /// Send a new message to Claude and get the complete response
@@ -62,6 +65,10 @@ final class ChatNonStreamManager: ChatManager {
    }
    
    private func processUserMessage(prompt: String) {
+      
+      guard let mcpClient else {
+         fatalError("Client not initialized")
+      }
       // Add a placeholder for Claude's response
       self.messages.append(ChatMessage(text: "", role: .assistant, isWaitingForFirstText: true))
       
@@ -76,7 +83,7 @@ final class ChatNonStreamManager: ChatManager {
             isLoading = true
             
             // Get available tools from MCP
-            let tools = try await mcpLLMClient.tools()
+            let tools = try await mcpClient.anthropicTools()
             
             // Send request and process response
             try await continueConversation(tools: tools)
@@ -142,7 +149,7 @@ final class ChatNonStreamManager: ChatManager {
             ))
             
             // Call tool via MCP
-            let toolResponse = await mcpLLMClient.callTool(name: tool.name, input: tool.input, debug: true)
+            let toolResponse = await mcpClient?.anthropicCallTool(name: tool.name, input: tool.input, debug: true)
             print("Tool response: \(String(describing: toolResponse))")
             
             // Add tool result to conversation

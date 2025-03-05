@@ -10,10 +10,17 @@ import SwiftAnthropic
 
 @main
 struct MCPClientChatApp: App {
+   
+   @State private var chatManager: ChatManager
+   private let githubClient = GIthubMCPClient()
+   
+   init() {
+      let service = AnthropicServiceFactory.service(apiKey: "", betaHeaders: nil)
       
-   @State private var chatManager = ChatNonStreamManager(
-      service: AnthropicServiceFactory.service(apiKey: "YOUR_API_KEY", betaHeaders: nil, debugEnabled: true),
-      mcpLLMClient: GIthubMCPClient())
+      let initialManager = AnthropicNonStreamManager(service: service)
+      
+      _chatManager = State(initialValue: initialManager)
+   }
    
    var body: some Scene {
       WindowGroup {
@@ -25,6 +32,11 @@ struct MCPClientChatApp: App {
             .toolbarBackgroundVisibility(
                .hidden, for: .windowToolbar
             )
+            .task {
+               if let client = try? await githubClient.getClientAsync() {
+                  chatManager.updateClient(client)
+               }
+            }
       }
       .windowStyle(.hiddenTitleBar)
    }

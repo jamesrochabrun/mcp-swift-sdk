@@ -9,17 +9,16 @@ import Foundation
 import MCPClient
 import SwiftUI
 
-final class GIthubMCPClient: MCPLLMClient {
+final class GIthubMCPClient {
    
-   var client: MCPClient?
+   private var client: MCPClient?
+   private let clientInitialized = AsyncStream.makeStream(of: MCPClient?.self)
    
    init() {
       Task {
          do {
-            /// Need to define manually the `env`  to be able to initialize client!!!
             var env = ProcessInfo.processInfo.environment
             env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:" + (env["PATH"] ?? "")
-            //    customEnv["GITHUB_PERSONAL_ACCESS_TOKEN"] = "YOUR_GITHUB_PERSONAL_TOKEN" // Needed for write operations.
             self.client = try await MCPClient(
                info: .init(name: "GIthubMCPClient", version: "1.0.0"),
                transport: .stdioProcess(
@@ -30,9 +29,21 @@ final class GIthubMCPClient: MCPLLMClient {
                ),
                capabilities: .init()
             )
+            clientInitialized.continuation.yield(self.client)
+            clientInitialized.continuation.finish()
          } catch {
             print("Failed to initialize MCPClient: \(error)")
+            clientInitialized.continuation.yield(nil)
+            clientInitialized.continuation.finish()
          }
       }
+   }
+
+   // Modern async/await approach
+   func getClientAsync() async throws -> MCPClient? {
+      for await client in clientInitialized.stream {
+         return client
+      }
+      return nil  // Stream completed without a client
    }
 }
