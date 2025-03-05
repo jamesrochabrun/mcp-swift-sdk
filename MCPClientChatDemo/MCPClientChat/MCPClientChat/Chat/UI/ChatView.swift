@@ -20,7 +20,6 @@ struct ChatView: View {
   var body: some View {
     List {
       ChatMessagesView(chatMessages: chatManager.messages)
-        .padding([.top, .leading, .trailing, .bottom])
     }
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
@@ -59,7 +58,9 @@ private struct ChatMessagesView: View {
           .onAppear {
             shouldAnimateMessageIn[message.id] = false
           }
+          .padding(.bottom, 4)
       }
     }
+    .padding()
   }
 }

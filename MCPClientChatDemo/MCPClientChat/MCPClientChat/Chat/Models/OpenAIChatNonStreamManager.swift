@@ -233,10 +233,3 @@ final class OpenAIChatNonStreamManager: ChatManager {
       task = nil
    }
 }
-
-// Helper extension to convert Data to String
-extension Data {
-   var asString: String? {
-      return String(data: self, encoding: .utf8)
-   }
-}
