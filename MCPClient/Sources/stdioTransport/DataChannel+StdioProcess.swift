@@ -147,9 +147,7 @@ extension Transport {
       if stdout.fileHandleForReading.fileDescriptor != stderr.fileHandleForReading.fileDescriptor {
         Task {
           for await data in stderr.fileHandleForReading.dataStream {
-            if verbose {
-              logger.log("Received error:\n\(String(data: data, encoding: .utf8) ?? "nil")")
-            }
+            logger.log("Received error:\n\(String(data: data, encoding: .utf8) ?? "nil")")
             stderrData.append(data)
           }
         }
