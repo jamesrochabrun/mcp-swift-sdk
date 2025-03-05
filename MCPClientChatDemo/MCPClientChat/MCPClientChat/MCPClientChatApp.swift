@@ -25,7 +25,7 @@ struct MCPClientChatApp: App {
       // Uncomment this and comment the above for OpenAI Demo
       
       //      let openAIService = OpenAIServiceFactory.service(apiKey: "", debugEnabled: true)
-      //      
+      //
       //      let openAIChatNonStreamManager = OpenAIChatNonStreamManager(service: openAIService)
       //
       //      _chatManager = State(initialValue: openAIChatNonStreamManager)
