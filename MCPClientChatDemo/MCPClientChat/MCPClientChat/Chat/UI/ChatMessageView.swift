@@ -51,14 +51,14 @@ struct ChatMessageView: View {
    private var chatIcon: some View {
       Image(systemName: message.role == .user ? "person.circle.fill" : "lightbulb.circle")
          .font(.title2)
-         .frame(width:24, height:24)
+         .frame(width: 24, height: 24)
          .foregroundColor(message.role == .user ? .primary : .orange)
    }
 
    private var chatName: some View {
       Text(message.role == .user ? "You" : "Assistant")
          .fontWeight(.bold)
-         .frame(maxWidth: .infinity, maxHeight:24, alignment: .leading)
+         .frame(maxWidth: .infinity, maxHeight: 24, alignment: .leading)
    }
 
    @ViewBuilder
@@ -81,6 +81,6 @@ struct ChatMessageView: View {
 
 #Preview {
    ChatMessageView(message: ChatMessage(text: "hello", role: .user), animateIn: false)
-      .frame(maxWidth:.infinity)
+      .frame(maxWidth: .infinity)
       .padding()
 }
