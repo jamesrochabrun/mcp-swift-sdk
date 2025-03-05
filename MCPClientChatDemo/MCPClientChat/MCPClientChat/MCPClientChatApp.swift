@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftAnthropic
+import SwiftOpenAI
 
 @main
 struct MCPClientChatApp: App {
@@ -15,11 +16,19 @@ struct MCPClientChatApp: App {
    private let githubClient = GIthubMCPClient()
    
    init() {
-      let service = AnthropicServiceFactory.service(apiKey: "", betaHeaders: nil)
+      let service = AnthropicServiceFactory.service(apiKey: "", betaHeaders: nil, debugEnabled: true)
       
       let initialManager = AnthropicNonStreamManager(service: service)
       
       _chatManager = State(initialValue: initialManager)
+      
+      // Uncomment this and comment the above for OpenAI Demo
+      
+      //      let openAIService = OpenAIServiceFactory.service(apiKey: "", debugEnabled: true)
+      //      
+      //      let openAIChatNonStreamManager = OpenAIChatNonStreamManager(service: openAIService)
+      //
+      //      _chatManager = State(initialValue: openAIChatNonStreamManager)
    }
    
    var body: some Scene {

@@ -56,7 +56,7 @@ struct ChatMessageView: View {
    }
    
    private var chatName: some View {
-      Text(message.role == .user ? "You" : "Claude")
+      Text(message.role == .user ? "You" : "Assistant")
          .fontWeight(.bold)
          .frame(maxWidth: .infinity, maxHeight:24, alignment: .leading)
    }
