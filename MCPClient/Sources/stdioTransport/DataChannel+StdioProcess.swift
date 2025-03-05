@@ -124,8 +124,6 @@ extension Transport {
     var stderrData = Data()
     let outStream: AsyncStream<Data>
     if verbose {
-      var truncatedData = Data()
-
       // As we are both reading stdout here in this function, and want to make the stream readable to the caller,
       // we read the data from the process's stdout, process it and then re-yield it to the caller to a new stream.
       // This is because an AsyncStream can have only one reader.
