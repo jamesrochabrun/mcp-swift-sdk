@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7BDD62DB2D764B3D00E18088 /* SwiftAnthropic in Frameworks */ = {isa = PBXBuildFile; productRef = 7BDD62DA2D764B3D00E18088 /* SwiftAnthropic */; };
 		7BDD62ED2D764B7C00E18088 /* MCPClient in Frameworks */ = {isa = PBXBuildFile; productRef = 7BDD62EC2D764B7C00E18088 /* MCPClient */; };
+		7BDD644F2D7811BA00E18088 /* SwiftOpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 7BDD644E2D7811BA00E18088 /* SwiftOpenAI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BDD62ED2D764B7C00E18088 /* MCPClient in Frameworks */,
+				7BDD644F2D7811BA00E18088 /* SwiftOpenAI in Frameworks */,
 				7BDD62DB2D764B3D00E18088 /* SwiftAnthropic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,6 +131,7 @@
 			packageProductDependencies = (
 				7BDD62DA2D764B3D00E18088 /* SwiftAnthropic */,
 				7BDD62EC2D764B7C00E18088 /* MCPClient */,
+				7BDD644E2D7811BA00E18088 /* SwiftOpenAI */,
 			);
 			productName = MCPClientChat;
 			productReference = 7BDD62A92D764A4A00E18088 /* MCPClientChat.app */;
@@ -215,6 +218,7 @@
 			packageReferences = (
 				7BDD62D72D764ADA00E18088 /* XCRemoteSwiftPackageReference "SwiftAnthropic" */,
 				7BDD62D82D764B1800E18088 /* XCLocalSwiftPackageReference "../../../mcp-swift-sdk" */,
+				7BDD644D2D7811B300E18088 /* XCRemoteSwiftPackageReference "SwiftOpenAI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7BDD62AA2D764A4A00E18088 /* Products */;
@@ -587,6 +591,14 @@
 				kind = branch;
 			};
 		};
+		7BDD644D2D7811B300E18088 /* XCRemoteSwiftPackageReference "SwiftOpenAI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jamesrochabrun/SwiftOpenAI";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -599,6 +611,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7BDD62D82D764B1800E18088 /* XCLocalSwiftPackageReference "../../../mcp-swift-sdk" */;
 			productName = MCPClient;
+		};
+		7BDD644E2D7811BA00E18088 /* SwiftOpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BDD644D2D7811B300E18088 /* XCRemoteSwiftPackageReference "SwiftOpenAI" */;
+			productName = SwiftOpenAI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
