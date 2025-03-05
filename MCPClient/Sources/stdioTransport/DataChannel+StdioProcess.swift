@@ -220,7 +220,7 @@ extension Transport {
     process.arguments = ["-c", "source ~/.zshenv; source ~/.zprofile; source ~/.zshrc; source ~/.zshrc; printenv"]
     let env = try getProcessStdout(process: process)
 
-    if let path = env?.split(separator: "\n").filter({ $0.starts(with: "PATH=") }).first {
+    if let path = env?.split(separator: "\n").filter({ $0.starts(with: "PATH=") }).last {
       return ["PATH": String(path.dropFirst("PATH=".count))]
     } else {
       return ProcessInfo.processInfo.environment
