@@ -87,51 +87,5 @@ extension Data {
   private static let quote = UInt8(ascii: "\"")
   private static let escape = UInt8(ascii: "\\")
 
-  /// Given a Data object that represents one or several valid JSON objects concatenated together, with the last one possibly unfinished,
-  /// return a list of Data objects, each representing a valid JSON object.
-  private var jsonObjects: [Data] {
-    var chunks = [Data]()
-    var isEscaping = false
-    var isInString = false
-
-    var openBraceCount = 0
-    var currentChunkStartIndex: Int? = 0
-
-    for (idx, byte) in enumerated() {
-      if isEscaping {
-        isEscaping = false
-        continue
-      }
-
-      if byte == Self.escape {
-        isEscaping = true
-        continue
-      }
-
-      if byte == Self.quote {
-        isInString = !isInString
-        continue
-      }
-
-      if !isInString {
-        if byte == Self.openBrace {
-          if openBraceCount == 0 {
-            currentChunkStartIndex = idx
-          }
-          openBraceCount += 1
-        } else if byte == Self.closeBrace {
-          openBraceCount -= 1
-
-          if openBraceCount == 0, let startIndex = currentChunkStartIndex {
-            let chunk = self[startIndex ..< idx + 1]
-            chunks.append(chunk)
-            currentChunkStartIndex = nil
-          }
-        }
-      }
-    }
-
-    return chunks
-  }
 
 }
