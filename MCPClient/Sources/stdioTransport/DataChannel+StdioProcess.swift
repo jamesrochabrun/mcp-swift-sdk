@@ -219,7 +219,9 @@ extension Transport {
   private static func loadZshEnvironment() throws -> [String: String] {
     let process = Process()
     process.launchPath = "/bin/zsh"
-    process.arguments = ["-c", "source ~/.zshrc && printenv"]
+    // Those are loaded for interactive login shell by zsh:
+   // https://www.freecodecamp.org/news/how-do-zsh-configuration-files-work/
+    process.arguments = ["-c", "source ~/.zshenv; source ~/.zprofile; source ~/.zshrc; source ~/.zshrc; printenv"]
     let env = try getProcessStdout(process: process)
 
     if let path = env?.split(separator: "\n").filter({ $0.starts(with: "PATH=") }).first {
