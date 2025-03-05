@@ -37,8 +37,7 @@ final class AnthropicNonStreamManager: ChatManager {
    /// Web research client for tool use
    private var mcpClient: MCPClient?
    
-   init(service: AnthropicService)
-   {
+   init(service: AnthropicService) {
       self.service = service
    }
    
