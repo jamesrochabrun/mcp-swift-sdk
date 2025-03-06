@@ -15,14 +15,14 @@ import SwiftOpenAI
 // MARK: Anthropic
 
 /// Extension that bridges the MCP (Multi-Client Protocol) framework with [SwiftAnthropic](https://github.com/jamesrochabrun/SwiftAnthropic) library.
-/// 
+///
 /// This Extension provides methods to:
 /// 1. Retrieve available tools from an MCP client and convert them to Anthropic's format
 /// 2. Execute tools with provided parameters and handle their responses
 extension MCPClient {
 
   /// Retrieves available tools from the MCP client and converts them to Anthropic's tool format.
-  /// 
+  ///
   /// - Returns: An array of Anthropic-compatible tools
   /// - Throws: Errors from the underlying MCP client or during conversion process
   func anthropicTools() async throws -> [SwiftAnthropic.MessageParameter.Tool] {
@@ -31,7 +31,7 @@ extension MCPClient {
   }
 
   /// Executes a tool with the specified name and input parameters.
-  /// 
+  ///
   /// - Parameters:
   ///   - name: The identifier of the tool to call
   ///   - input: Dictionary of parameters to pass to the tool
@@ -96,7 +96,7 @@ extension MCPClient {
 // MARK: OpenAI
 
 /// Extension that bridges the MCP (Multi-Client Protocol) framework with [SwiftOpenAI](https://github.com/jamesrochabrun/SwiftOpenAI) library.
-/// 
+///
 /// This Extension provides methods to:
 /// 1. Retrieve available tools from an MCP client and convert them to Anthropic's format
 /// 2. Execute tools with provided parameters and handle their responses

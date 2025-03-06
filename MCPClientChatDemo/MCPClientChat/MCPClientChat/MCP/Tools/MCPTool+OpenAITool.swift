@@ -15,11 +15,11 @@ extension MCPInterface.Tool {
   // MARK: Public
 
   /// Converts an MCP interface tool to SwiftOpenAI's tool format.
-  /// 
+  ///
   /// This function transforms the tool's metadata and schema structure from
   /// the MCP format to the format expected by the OpenAI API, ensuring
   /// compatibility between the two systems.
-  /// 
+  ///
   /// - Returns: A `SwiftOpenAI.Tool` representing the same
   ///   functionality as the original MCP tool.
   public func toOpenAITool() -> SwiftOpenAI.ChatCompletionParameters.Tool {
@@ -48,10 +48,10 @@ extension MCPInterface.Tool {
   // MARK: Private
 
   /// Converts MCP JSON object to SwiftOpenAI JSONSchema format.
-  /// 
+  ///
   /// This helper function transforms a JSON schema object from MCP format to the
   /// corresponding OpenAI format, handling the root schema properties.
-  /// 
+  ///
   /// - Parameter jsonObject: Dictionary containing MCP JSON schema properties
   /// - Returns: An equivalent SwiftOpenAI JSONSchema object, or nil if conversion fails
   private func convertToOpenAIJSONSchema(from jsonObject: [String: MCPInterface.JSON.Value]) -> SwiftOpenAI.JSONSchema? {
@@ -235,7 +235,7 @@ extension MCPInterface.Tool {
   }
 
   /// Extracts primitive value from JSON.Value for use in OpenAI schema properties.
-  /// 
+  ///
   /// - Parameter value: The JSON.Value to extract from
   /// - Returns: The primitive Swift type corresponding to the JSON value
   private func extractPrimitiveValue(from value: MCPInterface.JSON.Value) -> Any? {
@@ -265,7 +265,7 @@ extension MCPInterface.Tool {
 /// Extension for batch conversion of multiple MCP tools to OpenAI tools.
 extension Array where Element == MCPInterface.Tool {
   /// Converts an array of MCP interface tools to an array of SwiftOpenAI tools.
-  /// 
+  ///
   /// - Returns: An array of SwiftOpenAI.Tool objects
   public func toOpenAITools() -> [SwiftOpenAI.ChatCompletionParameters.Tool] {
     map { $0.toOpenAITool() }
