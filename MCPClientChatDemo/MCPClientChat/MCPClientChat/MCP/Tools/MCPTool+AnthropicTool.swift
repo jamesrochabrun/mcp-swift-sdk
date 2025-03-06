@@ -10,8 +10,6 @@ import MCPClient
 import MCPInterface
 import SwiftAnthropic
 
-// TODO: James+Gui decide where this should live so it can be reused.
-
 extension MCPInterface.Tool {
 
   // MARK: Public

@@ -1,3 +1,4 @@
+// swiftlint:disable no_direct_standard_out_logs
 //
 //  MCPLLMClient.swift
 //  MCPClientChat
@@ -10,8 +11,6 @@ import MCPClient
 import MCPInterface
 import SwiftAnthropic
 import SwiftOpenAI
-
-// TODO: James+Gui decide where this should live so it can be reused.
 
 // MARK: Anthropic
 
