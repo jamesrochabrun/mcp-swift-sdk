@@ -216,7 +216,7 @@ extension Transport {
     let process = Process()
     process.launchPath = "/bin/zsh"
     // Those are loaded for interactive login shell by zsh:
-   // https://www.freecodecamp.org/news/how-do-zsh-configuration-files-work/
+    // https://www.freecodecamp.org/news/how-do-zsh-configuration-files-work/
     process.arguments = ["-c", "source ~/.zshenv; source ~/.zprofile; source ~/.zshrc; source ~/.zshrc; printenv"]
     let env = try getProcessStdout(process: process)
 

@@ -87,5 +87,4 @@ extension Data {
   private static let quote = UInt8(ascii: "\"")
   private static let escape = UInt8(ascii: "\\")
 
-
 }
