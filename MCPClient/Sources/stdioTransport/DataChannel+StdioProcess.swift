@@ -242,20 +242,17 @@ extension Transport {
       return ProcessInfo.processInfo.environment
     }
 
-    // Parse shell environment
-    var mergedEnv: [String: String] = [:]
-    outputString.split(separator: "\n").forEach { line in
-      let components = line.split(separator: "=", maxSplits: 1)
-      guard components.count == 2 else { return }
-      let key = String(components[0])
-      let value = String(components[1])
-      mergedEnv[key] = value
-    }
-
     // Debug logging to verify environment was properly merged
     logger.debug("Shell environment loaded with user variables successfully merged")
 
-    return mergedEnv
+    return outputString
+      .split(separator: "\n")
+      .reduce(into: [String: String]()) { result, line in
+          // Parse the env variable key / value
+          let components = line.split(separator: "=", maxSplits: 1)
+          guard components.count == 2 else { return }
+          result[String(components[0])] = String(components[1])
+      }
   }
 
   private static func getProcessStdout(process: Process) throws -> String? {
