@@ -44,8 +44,6 @@ extension JSONRPCSetupError: LocalizedError {
 
 extension Transport {
 
-  // MARK: Public
-
   /// Creates a new `Transport` by launching the given executable with the specified arguments and attaching to its standard IO.
   public static func stdioProcess(
     _ executable: String,
@@ -218,7 +216,7 @@ extension Transport {
 
     // When userEnv exists, we need to explicitly export these variables in the shell
     // before running printenv so they're included in the environment output
-    if let userEnv = userEnv, !userEnv.isEmpty {
+    if let userEnv, !userEnv.isEmpty {
       var exportCommands = userEnv.map { key, value in
         "export \(key)=\(value.replacingOccurrences(of: "\"", with: "\\\""))"
       }.joined(separator: "; ")
@@ -248,10 +246,10 @@ extension Transport {
     return outputString
       .split(separator: "\n")
       .reduce(into: [String: String]()) { result, line in
-          // Parse the env variable key / value
-          let components = line.split(separator: "=", maxSplits: 1)
-          guard components.count == 2 else { return }
-          result[String(components[0])] = String(components[1])
+        // Parse the env variable key / value
+        let components = line.split(separator: "=", maxSplits: 1)
+        guard components.count == 2 else { return }
+        result[String(components[0])] = String(components[1])
       }
   }
 
