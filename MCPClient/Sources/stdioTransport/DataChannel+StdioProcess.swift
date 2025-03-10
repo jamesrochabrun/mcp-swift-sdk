@@ -215,7 +215,19 @@ extension Transport {
       // Load shell environment as base
       let shellProcess = Process()
       shellProcess.executableURL = URL(fileURLWithPath: "/bin/zsh")
-      shellProcess.arguments = ["-ilc", "printenv"]
+      
+      // When userEnv exists, we need to explicitly export these variables in the shell
+      // before running printenv so they're included in the environment output
+      if let userEnv = userEnv, !userEnv.isEmpty {
+         var exportCommands = userEnv.map { key, value in
+            return "export \(key)=\(value.replacingOccurrences(of: "\"", with: "\\\""))"
+         }.joined(separator: "; ")
+         
+         exportCommands += "; printenv"
+         shellProcess.arguments = ["-ilc", exportCommands]
+      } else {
+         shellProcess.arguments = ["-ilc", "printenv"]
+      }
       
       let outputPipe = Pipe()
       shellProcess.standardOutput = outputPipe
@@ -240,16 +252,12 @@ extension Transport {
          mergedEnv[key] = value
       }
       
-      // Overlay user-defined environment variables explicitly
-      userEnv?.forEach { key, value in
-         mergedEnv[key] = value
-      }
-      
-      // Log for debugging clarity
-      logger.debug("Final merged environment: \(mergedEnv)")
+      // Debug logging to verify environment was properly merged
+      logger.debug("Shell environment loaded with user variables successfully merged")
       
       return mergedEnv
    }
+   
   private static func getProcessStdout(process: Process) throws -> String? {
     let stdout = Pipe()
     let stderr = Pipe()
