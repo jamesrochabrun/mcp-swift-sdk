@@ -45,66 +45,66 @@ extension JSONRPCSetupError: LocalizedError {
 extension Transport {
 
   // MARK: Public
-   
-   /// Creates a new `Transport` by launching the given executable with the specified arguments and attaching to its standard IO.
-   public static func stdioProcess(
-      _ executable: String,
-      args: [String] = [],
-      cwd: String? = nil,
-      env: [String: String]? = nil,
-      verbose: Bool = false)
-   throws -> Transport
-   {
-      if verbose {
-         let command = "\(executable) \(args.joined(separator: " "))"
-         logger.log("Running ↪ \(command)")
+
+  /// Creates a new `Transport` by launching the given executable with the specified arguments and attaching to its standard IO.
+  public static func stdioProcess(
+    _ executable: String,
+    args: [String] = [],
+    cwd: String? = nil,
+    env: [String: String]? = nil,
+    verbose: Bool = false)
+    throws -> Transport
+  {
+    if verbose {
+      let command = "\(executable) \(args.joined(separator: " "))"
+      logger.log("Running ↪ \(command)")
+    }
+
+    // Create the process
+    func path(for executable: String, env: [String: String]?) -> String? {
+      guard !executable.contains("/") else {
+        return executable
       }
-      
-      // Create the process
-      func path(for executable: String, env: [String: String]?) -> String? {
-         guard !executable.contains("/") else {
-            return executable
-         }
-         do {
-            let path = try locate(executable: executable, env: env)
-            return path.isEmpty ? nil : path
-         } catch {
-            // Most likely an error because we could not locate the executable
-            return nil
-         }
+      do {
+        let path = try locate(executable: executable, env: env)
+        return path.isEmpty ? nil : path
+      } catch {
+        // Most likely an error because we could not locate the executable
+        return nil
       }
-      
-      let process = Process()
-      // In MacOS, zsh is the default since macOS Catalina 10.15.7. We can safely assume it is available.
-      process.launchPath = "/bin/zsh"
-      
-      if let executable = path(for: executable, env: env) {
-         // If executable is found directly, use user-provided env or current process env
-         process.environment = env ?? ProcessInfo.processInfo.environment
-         let command = "\(executable) \(args.joined(separator: " "))"
-         process.arguments = ["-c"] + [command]
-      } else {
-         // If we cannot locate the executable, try loading the default environment for zsh
-         process.environment = try loadZshEnvironment(userEnv: env)
-         let command = "\(executable) \(args.joined(separator: " "))"
-         process.arguments = ["-c"] + [command]
-      }
-      
-      // Working directory
-      if let cwd {
-         process.currentDirectoryPath = cwd
-      }
-      
-      // Input/output
-      let stdin = Pipe()
-      let stdout = Pipe()
-      let stderr = Pipe()
-      process.standardInput = stdin
-      process.standardOutput = stdout
-      process.standardError = stderr
-      
-      return try stdioProcess(unlaunchedProcess: process, verbose: verbose)
-   }
+    }
+
+    let process = Process()
+    // In MacOS, zsh is the default since macOS Catalina 10.15.7. We can safely assume it is available.
+    process.launchPath = "/bin/zsh"
+
+    if let executable = path(for: executable, env: env) {
+      // If executable is found directly, use user-provided env or current process env
+      process.environment = env ?? ProcessInfo.processInfo.environment
+      let command = "\(executable) \(args.joined(separator: " "))"
+      process.arguments = ["-c"] + [command]
+    } else {
+      // If we cannot locate the executable, try loading the default environment for zsh
+      process.environment = try loadZshEnvironment(userEnv: env)
+      let command = "\(executable) \(args.joined(separator: " "))"
+      process.arguments = ["-c"] + [command]
+    }
+
+    // Working directory
+    if let cwd {
+      process.currentDirectoryPath = cwd
+    }
+
+    // Input/output
+    let stdin = Pipe()
+    let stdout = Pipe()
+    let stderr = Pipe()
+    process.standardInput = stdin
+    process.standardOutput = stdout
+    process.standardError = stderr
+
+    return try stdioProcess(unlaunchedProcess: process, verbose: verbose)
+  }
 
   /// Creates a new `Transport` by launching the given process and attaching to its standard IO.
   public static func stdioProcess(
@@ -210,54 +210,54 @@ extension Transport {
     }
     return executablePath
   }
-   
-   private static func loadZshEnvironment(userEnv: [String: String]? = nil) throws -> [String: String] {
-      // Load shell environment as base
-      let shellProcess = Process()
-      shellProcess.executableURL = URL(fileURLWithPath: "/bin/zsh")
-      
-      // When userEnv exists, we need to explicitly export these variables in the shell
-      // before running printenv so they're included in the environment output
-      if let userEnv = userEnv, !userEnv.isEmpty {
-         var exportCommands = userEnv.map { key, value in
-            return "export \(key)=\(value.replacingOccurrences(of: "\"", with: "\\\""))"
-         }.joined(separator: "; ")
-         
-         exportCommands += "; printenv"
-         shellProcess.arguments = ["-ilc", exportCommands]
-      } else {
-         shellProcess.arguments = ["-ilc", "printenv"]
-      }
-      
-      let outputPipe = Pipe()
-      shellProcess.standardOutput = outputPipe
-      shellProcess.standardError = Pipe()
-      
-      try shellProcess.run()
-      shellProcess.waitUntilExit()
-      
-      let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
-      guard let outputString = String(data: data, encoding: .utf8) else {
-         logger.error("Failed to read environment from shell.")
-         return ProcessInfo.processInfo.environment
-      }
-      
-      // Parse shell environment
-      var mergedEnv: [String: String] = [:]
-      outputString.split(separator: "\n").forEach { line in
-         let components = line.split(separator: "=", maxSplits: 1)
-         guard components.count == 2 else { return }
-         let key = String(components[0])
-         let value = String(components[1])
-         mergedEnv[key] = value
-      }
-      
-      // Debug logging to verify environment was properly merged
-      logger.debug("Shell environment loaded with user variables successfully merged")
-      
-      return mergedEnv
-   }
-   
+
+  private static func loadZshEnvironment(userEnv: [String: String]? = nil) throws -> [String: String] {
+    // Load shell environment as base
+    let shellProcess = Process()
+    shellProcess.executableURL = URL(fileURLWithPath: "/bin/zsh")
+
+    // When userEnv exists, we need to explicitly export these variables in the shell
+    // before running printenv so they're included in the environment output
+    if let userEnv = userEnv, !userEnv.isEmpty {
+      var exportCommands = userEnv.map { key, value in
+        "export \(key)=\(value.replacingOccurrences(of: "\"", with: "\\\""))"
+      }.joined(separator: "; ")
+
+      exportCommands += "; printenv"
+      shellProcess.arguments = ["-ilc", exportCommands]
+    } else {
+      shellProcess.arguments = ["-ilc", "printenv"]
+    }
+
+    let outputPipe = Pipe()
+    shellProcess.standardOutput = outputPipe
+    shellProcess.standardError = Pipe()
+
+    try shellProcess.run()
+    shellProcess.waitUntilExit()
+
+    let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+    guard let outputString = String(data: data, encoding: .utf8) else {
+      logger.error("Failed to read environment from shell.")
+      return ProcessInfo.processInfo.environment
+    }
+
+    // Parse shell environment
+    var mergedEnv: [String: String] = [:]
+    outputString.split(separator: "\n").forEach { line in
+      let components = line.split(separator: "=", maxSplits: 1)
+      guard components.count == 2 else { return }
+      let key = String(components[0])
+      let value = String(components[1])
+      mergedEnv[key] = value
+    }
+
+    // Debug logging to verify environment was properly merged
+    logger.debug("Shell environment loaded with user variables successfully merged")
+
+    return mergedEnv
+  }
+
   private static func getProcessStdout(process: Process) throws -> String? {
     let stdout = Pipe()
     let stderr = Pipe()
