@@ -44,24 +44,20 @@ extension JSONRPCSetupError: LocalizedError {
 
 extension Transport {
 
-  /// Creates a new `Transport` by launching the given executable with the specified arguments and attaching to its standard IO.
-  public static func stdioProcess(
-    _ executable: String,
-    args: [String] = [],
-    cwd: String? = nil,
-    env: [String: String]? = nil,
-    verbose: Bool = false)
-    throws -> Transport
-  {
-    if verbose {
-      let command = "\(executable) \(args.joined(separator: " "))"
-      logger.log("Running ↪ \(command)")
-    }
-
-    // Create the process
-    func path(for executable: String, env: [String: String]?) -> String? {
-      guard !executable.contains("/") else {
-        return executable
+  // MARK: Public
+   
+   /// Creates a new `Transport` by launching the given executable with the specified arguments and attaching to its standard IO.
+   public static func stdioProcess(
+      _ executable: String,
+      args: [String] = [],
+      cwd: String? = nil,
+      env: [String: String]? = nil,
+      verbose: Bool = false)
+   throws -> Transport
+   {
+      if verbose {
+         let command = "\(executable) \(args.joined(separator: " "))"
+         logger.log("Running ↪ \(command)")
       }
       
       // Create the process
@@ -82,11 +78,17 @@ extension Transport {
       // In MacOS, zsh is the default since macOS Catalina 10.15.7. We can safely assume it is available.
       process.launchPath = "/bin/zsh"
       
-      // Load shell environment and merge with user-provided environment
-      process.environment = try loadZshEnvironment(userEnv: env)
-      
-      let command = "\(executable) \(args.joined(separator: " "))"
-      process.arguments = ["-c"] + [command]
+      if let executable = path(for: executable, env: env) {
+         // If executable is found directly, use user-provided env or current process env
+         process.environment = env ?? ProcessInfo.processInfo.environment
+         let command = "\(executable) \(args.joined(separator: " "))"
+         process.arguments = ["-c"] + [command]
+      } else {
+         // If we cannot locate the executable, try loading the default environment for zsh
+         process.environment = try loadZshEnvironment(userEnv: env)
+         let command = "\(executable) \(args.joined(separator: " "))"
+         process.arguments = ["-c"] + [command]
+      }
       
       // Working directory
       if let cwd {
