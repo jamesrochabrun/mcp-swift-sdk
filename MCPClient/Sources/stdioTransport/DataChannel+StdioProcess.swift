@@ -214,18 +214,14 @@ extension Transport {
     let shellProcess = Process()
     shellProcess.executableURL = URL(fileURLWithPath: "/bin/zsh")
 
-    // When userEnv exists, we need to explicitly export these variables in the shell
-    // before running printenv so they're included in the environment output
-    if let userEnv, !userEnv.isEmpty {
-      var exportCommands = userEnv.map { key, value in
-        "export \(key)=\(value.replacingOccurrences(of: "\"", with: "\\\""))"
-      }.joined(separator: "; ")
-
-      exportCommands += "; printenv"
-      shellProcess.arguments = ["-ilc", exportCommands]
+    // Set process environment - either use userEnv if it exists and isn't empty, or use system environment
+    if let env = userEnv, !env.isEmpty {
+      shellProcess.environment = env
     } else {
-      shellProcess.arguments = ["-ilc", "printenv"]
+      shellProcess.environment = ProcessInfo.processInfo.environment
     }
+
+    shellProcess.arguments = ["-ilc", "printenv"]
 
     let outputPipe = Pipe()
     shellProcess.standardOutput = outputPipe
@@ -240,13 +236,10 @@ extension Transport {
       return ProcessInfo.processInfo.environment
     }
 
-    // Debug logging to verify environment was properly merged
-    logger.debug("Shell environment loaded with user variables successfully merged")
-
+    // Parse shell environment
     return outputString
       .split(separator: "\n")
       .reduce(into: [String: String]()) { result, line in
-        // Parse the env variable key / value
         let components = line.split(separator: "=", maxSplits: 1)
         guard components.count == 2 else { return }
         result[String(components[0])] = String(components[1])
